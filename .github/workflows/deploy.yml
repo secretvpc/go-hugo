@@ -1,0 +1,42 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.126.1'
+          extended: true
+
+      - name: Setup Node.js (for PostCSS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install PostCSS dependencies
+        run: |
+          npm install --save-dev postcss postcss-cli autoprefixer
+          echo "module.exports = { plugins: { autoprefixer: {} } };" > postcss.config.js
+
+      - name: Build site
+        run: hugo --minify
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+
