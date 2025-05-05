@@ -4,106 +4,104 @@
 
 # go-hugo Documentation Site
 
-This repository hosts the **go-hugo** project — an academic, modular, and extensible documentation site built using [Hugo](https://gohugo.io) and the [Docsy](https://www.docsy.dev) theme. It is intended as a reference implementation for creating structured, production-grade documentation using open tools, GitHub Pages, and best practices for maintainable static websites.
+This project hosts the **go-hugo** documentation site — an academic, modular, and extensible static website built with [Hugo](https://gohugo.io) and the [Docsy](https://www.docsy.dev) theme. It serves as a reference implementation for creating structured, production-ready documentation using open tools and GitHub Pages.
 
 ---
 
-## 🔍 Project Goals
+## Project Objectives
 
-- Provide a clean and minimal Hugo + Docsy starter template.
-- Document every step of the installation, configuration, and deployment process.
-- Enable both manual and automated deployment to GitHub Pages.
-- Support modular documentation, multi-language capabilities, and CI/CD workflows.
-- Serve as a foundation for educational and production use cases.
+- Provide a clean, minimal starter template with Hugo and Docsy
+- Document each step of setup, configuration, and deployment
+- Support both manual and automated GitHub Pages deployments
+- Enable modular structure, multi-language support, and CI/CD workflows
+- Serve educational and production use cases
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 go-hugo/
-├── content/               # Markdown source files (docs, pages)
-├── static/                # Static assets (images, files)
-├── layouts/               # Custom layout overrides
-├── themes/                # Hugo modules (e.g., Docsy)
-├── config.toml           # Main Hugo configuration
-├── postcss.config.js     # SCSS/Autoprefixer config
-├── package.json          # Node.js deps (PostCSS)
-├── go.mod / go.sum       # Hugo module definitions
-├── public/               # Output directory (only locally)
-├── .github/workflows/    # GitHub Actions (CI/CD)
-└── docs-internal/        # Project documentation (howto-readme parts)
+├── archetypes/             # Content archetype templates
+├── assets/                 # SCSS, JS and processing assets
+├── content/                # Markdown documentation content
+├── data/                   # Site data (YAML/JSON/TOML)
+├── docs-internal/          # Internal project documentation (step-by-step)
+├── layouts/                # Custom templates and overrides
+├── static/                 # Static site assets (images, fonts, etc.)
+├── themes/                 # Hugo modules and themes (e.g., Docsy)
+├── config.toml             # Hugo site configuration
+├── go.mod / go.sum         # Hugo module dependencies
+├── package.json            # Node.js dependencies for PostCSS
+├── postcss.config.js       # PostCSS + Autoprefixer configuration
+└── .github/workflows/      # GitHub Actions workflow definitions
 ```
 
 ---
 
-## 🚀 Live Site
+## Live Site
 
-The documentation site is published at:  
-🔗 [https://secretvpc.github.io/go-hugo/](https://secretvpc.github.io/go-hugo/)
-
-It is automatically deployed via GitHub Actions from the `main` branch to the `gh-pages` branch.
+The site is automatically deployed via GitHub Actions at:  
+[https://secretvpc.github.io/go-hugo/](https://secretvpc.github.io/go-hugo/)
 
 ---
 
-## ⚙️ Getting Started
+## Getting Started
 
-### 1. Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/secretvpc/go-hugo.git
 cd go-hugo
 ```
 
-### 2. Install Requirements
+### 2. Install prerequisites
 
-- **Go** 1.22+
-- **Hugo Extended** 0.126+
-- **Node.js** 18+ (for PostCSS processing)
+- Go 1.22 or higher
+- Hugo Extended 0.126 or higher
+- Node.js 18+ (for SCSS/PostCSS)
 
-### 3. Install Node Dependencies
+### 3. Install Node.js dependencies
 
 ```bash
 npm install
 ```
 
-### 4. Run the Site Locally
+### 4. Run the development server
 
 ```bash
 hugo server --buildDrafts
 ```
 
-Visit: [http://localhost:1313/go-hugo/](http://localhost:1313/go-hugo/)
+Visit [http://localhost:1313/go-hugo/](http://localhost:1313/go-hugo/)
 
 ---
 
-## 🧪 Build & Deploy
+## Build and Deployment
 
-### Local production build:
+### Local production build
 
 ```bash
 hugo --minify
 ```
 
-### GitHub Pages deployment:
+### GitHub Pages deployment
 
-Deployment is handled by the GitHub Actions workflow in `.github/workflows/deploy.yml`. The site is published automatically to the `gh-pages` branch on every commit to `main` **if relevant files are changed** (e.g., `content/`, `static/`, `config.toml`).
+The deployment workflow is defined in `.github/workflows/deploy.yml`.  
+It builds the site and deploys it to the `gh-pages` branch only if site-related files are changed.
 
 ---
 
-## 📄 Project Documentation
+## Project Documentation
 
-Full step-by-step project history and setup is documented in:
+Project setup and configuration are documented in:
 
 - [`docs-internal/howto-readme-part1.md`](docs-internal/howto-readme-part1.md)
 - [`docs-internal/howto-readme-part2.md`](docs-internal/howto-readme-part2.md)
 - [`docs-internal/howto-readme-part3.md`](docs-internal/howto-readme-part3.md)
 
-These documents cover everything from initial setup to advanced deployment configuration.
 
----
-
-## 🧠 Credits and References
+## Credits and References
 
 This project is based on:
 
@@ -114,6 +112,6 @@ This project is based on:
 
 ---
 
-## ✅ License
+## License
 
 This project is licensed under the [MIT License](./LICENSE).
