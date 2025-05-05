@@ -2,7 +2,6 @@
 
 baseURL = "https://secretvpc.github.io/go-hugo/"
 title = "go-hugo Documentation Site"
-# theme = "docsy"
 languageCode = "en-us"
 DefaultContentLanguage = "en"
 enableGitInfo = true
@@ -19,7 +18,7 @@ enableRobotsTXT = true
     startLevel = 1
     endLevel = 3
 
-# Menu configuration
+# Site parameters
 [params]
   description = "Documentation site using Hugo and Docsy"
   github_repo = "https://github.com/secretvpc/go-hugo"
@@ -28,15 +27,22 @@ enableRobotsTXT = true
   github_subdir = ""
   ui_default_theme = "light"
 
-  # Enable features
+  # Enable/disable UI features
   disable_comments = true
   disable_search = false
   disable_breadcrumbs = false
   disable_edit = false
   disable_lastmod = false
 
-# Docsy theme options
-#[module]
-#  [[module.imports]]
-#    path = "github.com/google/docsy"
-#    disable = false
+# Main navigation menu
+[[menu.main]]
+  identifier = "docs"
+  name = "Documentation"
+  url = "/docs/overview/"
+  weight = 10
+
+# Hugo module configuration (Docsy theme)
+[module]
+  [[module.imports]]
+    path = "github.com/google/docsy"
+    disable = false
