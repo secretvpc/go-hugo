@@ -2,20 +2,18 @@
 
 **Last updated:** 2025-05-05
 
-This document describes the step-by-step setup and configuration process for the `go-hugo` project, which integrates the Hugo static site generator with the Docsy theme and Go module system.
+This document describes the complete setup and configuration process for the `go-hugo` project, which integrates the Hugo static site generator with the Docsy theme and Go module system, targeting deployment on GitHub Pages.
 
 ---
 
 ## 1. Repository Initialization
 
-- A private GitHub repository `go-hugo` was created at:  
-  https://github.com/secretvpc/go-hugo
-
-- The repository contains the following initial files:
+- A GitHub repository `go-hugo` was created: https://github.com/secretvpc/go-hugo
+- Initial files:
   - `.gitignore`
   - `README.md`
   - `LICENSE`
-  - Default branch: `main` (automatically set by GitHub)
+- Default branch: `main`
 
 ---
 
@@ -30,30 +28,35 @@ cd go-hugo
 
 ## 3. Installing Go
 
-- The default Ubuntu package provided an outdated version: Go 1.18.1
-- To install the latest stable version (Go 1.22.2):
+The system originally had Go 1.18.1 installed via `apt`. It was removed and replaced with the latest stable version.
+
+### Install Go 1.22.2 manually:
 
 ```bash
 wget https://go.dev/dl/go1.22.2.linux-amd64.tar.gz
 sudo rm -rf /usr/local/go
 sudo tar -C /usr/local -xzf go1.22.2.linux-amd64.tar.gz
-```
-
-- The following line was added at the top of `~/.bashrc`:
-
-```bash
-export PATH=/usr/local/go/bin:$PATH
-```
-
-- Environment reloaded:
-
-```bash
+echo 'export PATH=/usr/local/go/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
-go version
-# Output: go version go1.22.2 linux/amd64
+go version  # should show go1.22.2
 ```
 
-- The legacy Go 1.18 packages were removed:
+---
+
+## 4. Installing Hugo Extended
+
+The default `apt` package was outdated and non-extended. Instead, the Extended version was installed manually:
+
+```bash
+wget https://github.com/gohugoio/hugo/releases/download/v0.126.1/hugo_extended_0.126.1_Linux-64bit.tar.gz
+tar -xvzf hugo_extended_0.126.1_Linux-64bit.tar.gz
+sudo mv hugo /usr/local/bin/
+hugo version  # should show +extended
+```
+
+---
+
+## 5. Removing Old Go
 
 ```bash
 sudo apt purge golang-go
@@ -62,93 +65,23 @@ sudo apt autoremove
 
 ---
 
-## 4. Installing Hugo Extended
-
-- The default `apt` version was 0.92.2 (non-extended), which is incompatible with Docsy.
-- Installed manually from official release:
+## 6. Creating Hugo Site in Existing Repository
 
 ```bash
-wget https://github.com/gohugoio/hugo/releases/download/v0.126.1/hugo_extended_0.126.1_Linux-64bit.tar.gz
-tar -xvzf hugo_extended_0.126.1_Linux-64bit.tar.gz
-sudo mv hugo /usr/local/bin/
-hugo version
-# Output: hugo v0.126.1+extended linux/amd64
-```
-
----
-
-## 5. Adding Docsy Theme as Git Submodule
-
-```bash
-git submodule add https://github.com/google/docsy.git themes/docsy
-```
-
----
-
-## 6. `.gitignore` Configuration
-
-The following rules were added to `.gitignore` to exclude build artifacts and dependencies:
-
-```gitignore
-# Go
-/bin/
-/pkg/
-/vendor/
-
-# Hugo
-/public/
-/resources/_gen/
-/hugo_stats.json
-
-# Node.js (for Docsy theme management)
-/node_modules/
-/package-lock.json
-
-# OS/editor artifacts
-.DS_Store
-.idea/
-.vscode/
-*.swp
-```
-
----
-
-## 7. Hugo Site Initialization
-
-The Hugo site structure was created directly in the existing repository using:
-
-```bash
+cd ~/secretvpc/go-hugo
 hugo new site . --force
 ```
 
-This ensured that no existing files (e.g., `.gitignore`, `README.md`) were overwritten, while adding the standard Hugo directories:
+This created:
 - `config.toml`
 - `content/`
 - `layouts/`
-- `archetypes/`
 - `static/`
-
-The default file `hugo.toml` was removed, as it is superseded by the new `config.toml`.
-
----
-
-## 8. Hugo Configuration for Docsy (config.toml)
-
-A full `config.toml` file was generated, including:
-- `baseURL` for GitHub Pages: `https://secretvpc.github.io/go-hugo/`
-- Theme declaration: `docsy`
-- GitHub integration (`params.github_repo`)
-- Markup configuration for Goldmark and SCSS rendering
-- Hugo module import for Docsy
-
-This file is now used as the main site configuration. The obsolete `hugo.toml` was deleted.
+- `archetypes/`
 
 ---
 
-
-## 9. Removing Default hugo.toml
-
-The Hugo command `hugo new site` generated a default file `hugo.toml`, which is not used when a `config.toml` file is present. This file was deleted to avoid confusion:
+## 7. Removing Redundant hugo.toml
 
 ```bash
 rm hugo.toml
@@ -156,29 +89,59 @@ rm hugo.toml
 
 ---
 
-## 10. Verifying Hugo Setup
+## 8. Preparing for Docsy Theme (Switch from Submodule to Module)
 
-The installed Hugo version was verified to be the Extended variant:
+Originally, Docsy was added as a Git submodule:
 
 ```bash
-hugo version
-# Output: hugo v0.126.1+extended linux/amd64
+git submodule add https://github.com/google/docsy.git themes/docsy
 ```
 
-This confirms that the system is ready to build and serve Docsy-based Hugo sites.
+This was later removed to switch to Hugo Modules:
+
+```bash
+git submodule deinit themes/docsy
+git rm themes/docsy
+rm -rf .git/modules/themes/docsy
+rm -rf themes/docsy
+```
 
 ---
 
-## Next Steps (Planned)
+## 9. Configuring Hugo Modules
 
-- Add a sample page using:
+### `config.toml` was updated to include:
+
+```toml
+[module]
+  [[module.imports]]
+    path = "github.com/google/docsy"
+```
+
+The `theme = "docsy"` line was removed to comply with Hugo Module usage.
+
+---
+
+## 10. Initializing Hugo Module System
+
+```bash
+hugo mod init github.com/secretvpc/go-hugo
+```
+
+This created a `go.mod` file to manage Hugo module dependencies.
+
+---
+
+## Next Steps
+
+- Run `hugo mod tidy` to fetch dependencies.
+- Create a sample content file:
   ```bash
   hugo new content/docs/overview.md
   ```
-- Create navigation menus in `config.toml`
-- Serve the site locally for verification:
+- Add site navigation in `config.toml`.
+- Preview the site locally:
   ```bash
   hugo server --buildDrafts
   ```
 
-**Last updated:** 2025-05-05
