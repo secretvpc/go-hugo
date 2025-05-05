@@ -23,3 +23,23 @@ go.work.sum
 
 # env file
 .env
+
+# Go
+/bin/
+/pkg/
+/vendor/
+
+# Hugo
+/public/
+/resources/_gen/
+/hugo_stats.json
+
+# Node (Docsy)
+/node_modules/
+/package-lock.json
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
