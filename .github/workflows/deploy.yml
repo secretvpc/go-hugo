@@ -3,6 +3,20 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    paths:
+      - 'content/**'
+      - 'static/**'
+      - 'layouts/**'
+      - 'config.*'
+      - 'archetypes/**'
+      - 'data/**'
+      - 'i18n/**'
+      - 'assets/**'
+      - 'themes/**'
+      - 'package.json'
+      - 'postcss.config.js'
+      - 'hugo.toml'
+      - '.github/workflows/deploy.yml'
 
 jobs:
   build:
@@ -39,4 +53,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
-

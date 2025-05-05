@@ -1,7 +1,5 @@
 # go-hugo Project Setup — Part 3
 
-**Covers step 18: Automatic GitHub Pages Deployment via GitHub Actions**  
-**Last updated:** 2025-05-05
 
 ---
 
@@ -70,3 +68,69 @@ jobs:
   [https://secretvpc.github.io/go-hugo/](https://secretvpc.github.io/go-hugo/)
 
 ---
+
+---
+
+## 19. Granting Write Permissions to GitHub Actions
+
+To enable `github-actions[bot]` to successfully push to the `gh-pages` branch, write permissions must be granted explicitly in the repository settings.
+
+### Required Change:
+
+1. Navigate to the repository on GitHub.
+2. Go to: `Settings` → `Actions` → `General`
+3. Scroll to **Workflow permissions**
+4. Select: `Read and write permissions`
+5. Save the change.
+
+This allows GitHub Actions to commit and push the contents of `public/` to the `gh-pages` branch.
+
+### Result:
+
+Subsequent workflow runs complete successfully, and the site is automatically published at:
+
+🔗 https://secretvpc.github.io/go-hugo/
+
+---
+
+## 20. Optimizing Workflow Trigger Conditions
+
+To prevent unnecessary deployments, the GitHub Actions workflow was updated to run **only when site-related files change**.
+
+### deploy.yml modification:
+
+The `on.push.paths` section was added to the workflow:
+
+```yaml
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/**'
+      - 'static/**'
+      - 'layouts/**'
+      - 'config.*'
+      - 'archetypes/**'
+      - 'data/**'
+      - 'i18n/**'
+      - 'assets/**'
+      - 'themes/**'
+      - 'package.json'
+      - 'postcss.config.js'
+      - 'hugo.toml'
+      - '.github/workflows/deploy.yml'
+```
+---
+
+### Result:
+
+Workflow now triggers **only** if changes occur in:
+- Hugo configuration or theme files
+- Content, layout, assets, static directories
+- Site build config files (e.g., PostCSS)
+
+Changes to unrelated files like `README.md` or internal docs no longer cause deployments.
+
+---
+  
+**Last updated:** 2025-05-05
