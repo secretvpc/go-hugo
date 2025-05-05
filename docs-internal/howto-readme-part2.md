@@ -1,7 +1,6 @@
 # go-hugo Project Setup — Part 2
 
-**Covers steps 12–15**  
-**Last updated:** 2025-05-05
+**Covers steps 12–16**
 
 ---
 
@@ -75,3 +74,61 @@ node_modules/
 ## Next Step
 
 - Prepare the `gh-pages` branch for GitHub Pages deployment.
+
+---
+
+## 16. Manual Deployment to GitHub Pages
+
+The Hugo site's production build was deployed manually to GitHub Pages using the `gh-pages` branch and Git worktree.
+
+### Purpose:
+
+To publish the contents of `public/` to GitHub Pages via a dedicated branch.
+
+### Steps:
+
+1. Initialize the `gh-pages` branch (once):
+   ```bash
+   git checkout --orphan gh-pages
+   git rm -rf .
+   echo "Initial commit" > index.html
+   git add index.html
+   git commit -m "init gh-pages"
+   git push origin gh-pages
+   ```
+
+2. Switch back to `main` and create a worktree:
+   ```bash
+   git checkout main
+   git worktree add -B gh-pages ../gh-pages origin/gh-pages
+   ```
+
+3. Copy Hugo output to the worktree:
+   ```bash
+   rm -rf ../gh-pages/*
+   cp -r public/* ../gh-pages/
+   ```
+
+4. Commit and push:
+   ```bash
+   cd ../gh-pages
+   git add .
+   git commit -m "Deploy Hugo site"
+   git push origin gh-pages
+   ```
+
+### GitHub Pages Settings:
+
+- Source: `gh-pages`
+- Folder: `/ (root)`
+
+### Result:
+
+The site is now published at:  
+[https://secretvpc.github.io/go-hugo/](https://secretvpc.github.io/go-hugo/)
+
+---
+
+**Last updated:** 2025-05-05
+
+---
