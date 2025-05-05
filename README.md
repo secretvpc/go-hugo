@@ -1,3 +1,7 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+---
+
 # go-hugo Documentation Site
 
 This repository hosts the **go-hugo** project — an academic, modular, and extensible documentation site built using [Hugo](https://gohugo.io) and the [Docsy](https://www.docsy.dev) theme. It is intended as a reference implementation for creating structured, production-grade documentation using open tools, GitHub Pages, and best practices for maintainable static websites.
@@ -112,4 +116,4 @@ This project is based on:
 
 ## ✅ License
 
-This repository is licensed under the MIT License. See `LICENSE` for details.
+This project is licensed under the [MIT License](./LICENSE).
