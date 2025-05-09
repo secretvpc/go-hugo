@@ -1,150 +1,152 @@
 # go-hugo Project Setup — Part 4
 
-**Covers steps 21–27: Cloudflare Integration (Custom Domain + TLS)**
+**Covers steps 21–23 + troubleshooting**
 
 ---
 
-## ✅ 21. Configuring Custom Domain `go-hugo.secretvpc.dev` via Cloudflare
+## 21. Custom Domain Configuration with Cloudflare
 
-This step connects a Cloudflare-managed custom subdomain to the existing Hugo site deployed via GitHub Pages.
+This step connects your GitHub Pages deployment to a custom domain via Cloudflare.
 
-### 🧭 Goal
+### 🏡 Objective
 
-Make the go-hugo site accessible at:  
-`https://go-hugo.secretvpc.dev`
-
----
-
-### 📌 Prerequisites
-
-- The `go-hugo` site is already deployed to:  
-  `https://secretvpc.github.io/go-hugo/`
-- You own and manage the domain `secretvpc.dev` via Cloudflare
-- GitHub repository uses `gh-pages` branch for deployment
+Connect `go-hugo.secretvpc.dev` to `secretvpc.github.io` with proper DNS and SSL settings.
 
 ---
 
-### 🛠️ Steps
+### ✅ Step-by-Step: DNS Setup in Cloudflare
 
-#### 1. Create DNS record in Cloudflare
+1. **Log into Cloudflare Dashboard:**
+   [https://dash.cloudflare.com](https://dash.cloudflare.com)
 
-1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/)
-2. Choose domain: `secretvpc.dev`
-3. Navigate to **DNS** → **Records**
-4. Click **Add record**
-   - **Type:** `CNAME`
-   - **Name:** `go-hugo`
-   - **Target:** `secretvpc.github.io`
-   - **Proxy status:** `DNS only` (gray cloud)
-5. Save
+2. **Select your domain:**
+   Click on `secretvpc.dev` from your domain list.
 
-This links `go-hugo.secretvpc.dev` to the public GitHub Pages IP via DNS.
+3. **Navigate to DNS > Records:**
+   Menu: `DNS` → `Records`
+
+4. **Add a CNAME Record:**
+
+   | Field        | Value                       |
+   | ------------ | --------------------------- |
+   | Type         | `CNAME`                     |
+   | Name         | `go-hugo`                   |
+   | Target       | `secretvpc.github.io`       |
+   | TTL          | `Auto`                      |
+   | Proxy status | `DNS only` (**gray cloud**) |
+
+5. **Save the record.**
 
 ---
 
-#### 2. Add `CNAME` file to site output (`public/`)
+### ⚡ Step-by-Step: SSL/TLS Configuration in Cloudflare
 
-In the Hugo build directory (`public/`), create a file named `CNAME` with a single line:
+1. Go to: `SSL/TLS` → `Overview`
 
+   * **Encryption Mode:** `Full` (not Flexible, not Full (strict))
+
+2. Go to: `SSL/TLS` → `Edge Certificates`
+
+   * **Always Use HTTPS:** `On`
+   * **Automatic HTTPS Rewrites:** `On`
+   * \*\*Certificate for `*.secretvpc.dev` must be active\`
+
+3. Skip: `Custom Hostnames`, `Custom Certificates`
+
+---
+
+## 22. Configuring Hugo for Custom Domain Deployment
+
+### Update `config.toml`:
+
+```toml
+baseURL = "https://go-hugo.secretvpc.dev/"
 ```
-go-hugo.secretvpc.dev
-```
 
-This tells GitHub Pages to serve the site at the custom domain.
-
----
-
-#### 3. Automate `CNAME` file in GitHub Actions
-
-Add this step in `.github/workflows/deploy.yml` **before** the deploy step:
-
-```yaml
-- name: Add CNAME for custom domain
-  run: echo "go-hugo.secretvpc.dev" > public/CNAME
-```
-
-This ensures the `CNAME` file is created dynamically on every deploy.
-
----
-
-#### 4. Commit and push the workflow
+### Add a `CNAME` file:
 
 ```bash
-git add .github/workflows/deploy.yml
-git commit -m "Add CNAME setup for go-hugo.secretvpc.dev"
+echo "go-hugo.secretvpc.dev" > static/CNAME
+```
+
+> Hugo will copy this file into the `public/` directory on build.
+
+### Rebuild the site:
+
+```bash
+hugo --minify
+```
+
+### Deploy the site (Manual or via GitHub Actions):
+
+If manual:
+
+```bash
+rm -rf ../gh-pages/*
+cp -r public/* ../gh-pages/
+cd ../gh-pages
+git add .
+git commit -m "Deploy with custom domain"
 git push
 ```
 
-A new deploy should run and push the updated `public/` folder with the `CNAME` to `gh-pages`.
+---
+
+## 23. GitHub Pages Settings for Custom Domain
+
+1. Go to: GitHub repo → `Settings` → `Pages`
+
+2. Under "Custom domain":
+
+   * Enter: `go-hugo.secretvpc.dev`
+   * Enable: `Enforce HTTPS`
+
+3. Wait for certificate issuance (2–5 mins).
+
+   * You should see: `Certificate: Active`
 
 ---
 
-#### 5. Update GitHub Pages settings (once)
+## ⚠️ Troubleshooting: Custom Domain 404 + SSL
 
-In your GitHub repo:
-1. Go to **Settings** → **Pages**
-2. Under **Custom domain**, enter: `go-hugo.secretvpc.dev`
-3. Save
-4. Enable "Enforce HTTPS" if available
+### Problem 1: 404 Error at root domain
 
----
+**Symptom:** You open `https://go-hugo.secretvpc.dev` and see a 404 error.
 
-#### ✅ Result
+**Cause:** Hugo was built with `baseURL = "https://secretvpc.github.io/go-hugo/"`, so all links point to `/go-hugo/`.
 
-Your site will now be live at:
+**Fix:**
 
-🔗 [https://go-hugo.secretvpc.dev](https://go-hugo.secretvpc.dev)
+* Set `baseURL = "https://go-hugo.secretvpc.dev/"`
+* Rebuild and redeploy the site
 
----
+### Problem 2: SSL Certificate Invalid (ERR\_CERT\_COMMON\_NAME\_INVALID)
 
-## 22. Configuring SSL/TLS in Cloudflare for Custom Domain
+**Symptom:** HTTPS fails with a certificate error.
 
-To ensure secure HTTPS access to the site at `https://go-hugo.secretvpc.dev`, we configure Cloudflare's SSL/TLS settings appropriately.
+**Causes:**
 
----
+* Missing `CNAME` file
+* GitHub not configured with your domain
 
-### ✅ Goal
+**Fixes:**
 
-- Enable secure TLS encryption for GitHub Pages behind Cloudflare
-- Avoid certificate mismatch issues
-- Allow fast HTTPS propagation
+* Ensure `static/CNAME` exists and is included in every build
+* Go to GitHub Pages settings → enter `go-hugo.secretvpc.dev` as Custom domain
+* Enable `Enforce HTTPS`
 
----
+### Problem 3: GitHub Pages not deploying to root
 
-### 🛠️ Steps
+**Symptom:** Only `https://go-hugo.secretvpc.dev/go-hugo/` works
 
-#### 1. Go to the Cloudflare Dashboard
+**Cause:** You are still deploying the site to a subdirectory
 
-- Select the domain: `secretvpc.dev`
+**Fix:**
 
----
-
-#### 2. Navigate to: **SSL/TLS** → **Overview**
-
-- Set SSL/TLS encryption mode to:  
-  🔹 `Full`  
-  (⚠️ Not "Full (Strict)" unless you manage your own certificate on GitHub Pages)
-
-> Full mode encrypts between Cloudflare and GitHub, without requiring GitHub’s certificate to be signed by a recognized CA.
+* Clean `gh-pages` directory
+* Deploy content of `public/` directly to root
 
 ---
 
-#### 3. Enable “Always Use HTTPS”
-
-- Under **SSL/TLS** → **Edge Certificates**
-- Turn on:
-  - ✅ Always Use HTTPS
-  - ✅ Automatic HTTPS Rewrites (optional)
-  - ✅ Opportunistic Encryption (optional)
-
----
-
-#### ✅ Result
-
-Your site is now available at:
-
-🔗 `https://go-hugo.secretvpc.dev`
-
-With:
-- End-to-end encryption (GitHub Pages → Cloudflare → Browser)
-- No certificate warnings
+**End of Part 4**
+**Next steps:** Optional enhancements like redirect rules, robots.txt, custom error pages, or analytics integration.
