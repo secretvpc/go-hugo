@@ -1,6 +1,8 @@
 # config.toml - Hugo configuration for go-hugo with Docsy theme
 
-baseURL = "https://secretvpc.github.io/go-hugo/"
+#baseURL = "https://secretvpc.github.io/go-hugo/"
+baseURL = "https://go-hugo.secretvpc.dev/"
+
 title = "go-hugo Documentation Site"
 languageCode = "en-us"
 DefaultContentLanguage = "en"
